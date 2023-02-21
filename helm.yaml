@@ -50,8 +50,7 @@ data:
         # Event Hub uses SASL PLAIN authentication for its Kafka-compatible endpoint
         sasl:
           sasl_type: plain
-          username: $ConnectionString
-          password: Endpoint=sb://eh-uiversal-corvus-test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=7WXWq9FEzJ/OjXBPExlpxcMBFooy+iKtimQBj9MUSVg=
+          secret_name: eh-secret
     topicMap:
       configYaml:
         route:
