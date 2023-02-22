@@ -25,4 +25,42 @@ spec:
         name: e4k-repo
       version: 0.1.0-amd64
   interval: 1m0s
-  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-identities
+  namespace: flux-system
+data:
+  values.yaml: |
+    connector:
+      enabled: true
+    e4kconnector:
+      kafka:
+        # Port 9093 is Event Hub's Kakfa endpoint
+        endpoint: eh-uiversal-corvus-test.servicebus.windows.net:9093
+        # Kafka consumer group id prefix
+        # Unique for every route that sinks from Kafka to E4K
+        group_id_prefix: e4kconnector
+        # Interval to commit consumer reading offset position to Kafka broker
+        auto_commit_interval_ms: 5000
+        listener:
+          # Event Hub uses SSL
+          type: ssl
+          # Event Hub uses SASL PLAIN authentication for its Kafka-compatible endpoint
+          sasl:
+            sasl_type: plain
+            secret_name: eh-secret
+      topicMap:
+        configYaml:
+          route:
+            # Pull from MQTT topic "temperature-alerts" and push to Kafka topic "<RECEIVING_EH_NAME>"
+            # Default partition 0 only
+            - kafka: eh-ue-iot-kafka
+              mqtt: aks-ee-test-topic
+              sink_to: kafka
+            # Pull from kafka topic "<SENDING_EH_NAME>" and push to MQTT topic "heater-commands"
+            # Default partition 0 only
+            # - kafka: <SENDING_EH_NAME>
+            #  mqtt: heater-commands
+            #  sink_to: mqtt
